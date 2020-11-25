@@ -187,17 +187,5 @@ for runtime in ["async-std", "tokio", "actix"]:
             tag=f"mariadb_{version}" if runtime == "async-std" else f"mariadb_{version}_{runtime}",
         )
 
-    #
-    # mssql
-    #
-
-    for version in ["2019"]:
-        run(
-            f"cargo test --no-default-features --features macros,offline,any,all-types,mssql,runtime-{runtime}",
-            comment=f"test mssql {version}",
-            service=f"mssql_{version}",
-            tag=f"mssql_{version}" if runtime == "async-std" else f"mssql_{version}_{runtime}",
-        )
-
 # TODO: Use [grcov] if available
 # ~/.cargo/bin/grcov tests/.cache/target/debug -s sqlx-core/ -t html --llvm --branch -o ./target/debug/coverage

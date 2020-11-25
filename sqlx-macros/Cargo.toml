@@ -40,7 +40,6 @@ offline = ["sqlx-core/offline", "serde", "serde_json", "hex", "sha2"]
 mysql = [ "sqlx-core/mysql" ]
 postgres = [ "sqlx-core/postgres" ]
 sqlite = [ "sqlx-core/sqlite" ]
-mssql = [ "sqlx-core/mssql" ]
 
 # type
 bigdecimal = [ "sqlx-core/bigdecimal" ]

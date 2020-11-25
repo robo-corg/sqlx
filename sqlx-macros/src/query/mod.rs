@@ -88,19 +88,6 @@ fn expand_from_db(input: QueryMacroInput, db_url: &str) -> crate::Result<TokenSt
         #[cfg(not(feature = "postgres"))]
         "postgres" | "postgresql" => Err("database URL has the scheme of a PostgreSQL database but the `postgres` feature is not enabled".into()),
 
-        #[cfg(feature = "mssql")]
-        "mssql" | "sqlserver" => {
-            let data = block_on(async {
-                let mut conn = sqlx_core::mssql::MssqlConnection::connect(db_url.as_str()).await?;
-                QueryData::from_db(&mut conn, &input.src).await
-            })?;
-
-            expand_with_data(input, data, false)
-        },
-
-        #[cfg(not(feature = "mssql"))]
-        "mssql" | "sqlserver" => Err("database URL has the scheme of a MSSQL database but the `mssql` feature is not enabled".into()),
-
         #[cfg(feature = "mysql")]
         "mysql" | "mariadb" => {
             let data = block_on(async {

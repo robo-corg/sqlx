@@ -20,12 +20,10 @@ default = [ "migrate" ]
 migrate = [ "sha2", "crc" ]
 
 # databases
-all-databases = [ "postgres", "mysql", "sqlite", "mssql", "any" ]
+all-databases = [ "postgres", "mysql", "sqlite" ]
 postgres = [ "md-5", "sha2", "base64", "sha-1", "rand", "hmac", "futures-channel/sink", "futures-util/sink" ]
 mysql = [ "sha-1", "sha2", "generic-array", "num-bigint", "base64", "digest", "rand", "rsa" ]
 sqlite = [ "libsqlite3-sys" ]
-mssql = [ "uuid", "encoding_rs", "regex" ]
-any = []
 
 # types
 all-types = [ "chrono", "time", "bigdecimal", "decimal", "ipnetwork", "json", "uuid", "bit-vec" ]

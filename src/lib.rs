@@ -38,24 +38,9 @@ pub use sqlx_core::error::{self, Error, Result};
 #[cfg(feature = "migrate")]
 pub use sqlx_core::migrate;
 
-#[cfg(all(
-    any(
-        feature = "mysql",
-        feature = "sqlite",
-        feature = "postgres",
-        feature = "mssql"
-    ),
-    feature = "any"
-))]
-pub use sqlx_core::any::{self, Any, AnyConnection, AnyPool};
-
 #[cfg(feature = "mysql")]
 #[cfg_attr(docsrs, doc(cfg(feature = "mysql")))]
 pub use sqlx_core::mysql::{self, MySql, MySqlConnection, MySqlPool};
-
-#[cfg(feature = "mssql")]
-#[cfg_attr(docsrs, doc(cfg(feature = "mssql")))]
-pub use sqlx_core::mssql::{self, Mssql, MssqlConnection, MssqlPool};
 
 #[cfg(feature = "postgres")]
 #[cfg_attr(docsrs, doc(cfg(feature = "postgres")))]
@@ -90,7 +75,6 @@ pub mod ty_match;
 ///  * [PostgreSQL](../postgres/types/index.html)
 ///  * [MySQL](../mysql/types/index.html)
 ///  * [SQLite](../sqlite/types/index.html)
-///  * [MSSQL](../mssql/types/index.html)
 ///
 /// Any external types that have had [`Type`] implemented for, are re-exported in this module
 /// for convenience as downstream users need to use a compatible version of the external crate

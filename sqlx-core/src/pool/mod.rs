@@ -16,7 +16,6 @@
 //! Type aliases are provided for each database to make it easier to sprinkle `Pool` through
 //! your codebase:
 //!
-//! * [MssqlPool][crate::mssql::MssqlPool] (MSSQL)
 //! * [MySqlPool][crate::mysql::MySqlPool] (MySQL)
 //! * [PgPool][crate::postgres::PgPool] (PostgreSQL)
 //! * [SqlitePool][crate::sqlite::SqlitePool] (SQLite)
@@ -33,13 +32,7 @@
 //! let pool = Pool::<Postgres>::connect("postgres://").await?;
 //! ```
 //!
-//! For convenience, database-specific type aliases are provided:
-//!
-//! ```rust,ignore
-//! use sqlx::mssql::MssqlPool;
-//!
-//! let pool = MssqlPool::connect("mssql://").await?;
-//! ```
+//! For convenience, database-specific type aliases are provided.
 //!
 //! # Using a connection pool
 //!
@@ -107,7 +100,6 @@ pub use self::options::PoolOptions;
 /// Type aliases are provided for each database to make it easier to sprinkle `Pool` through
 /// your codebase:
 ///
-/// * [MssqlPool][crate::mssql::MssqlPool] (MSSQL)
 /// * [MySqlPool][crate::mysql::MySqlPool] (MySQL)
 /// * [PgPool][crate::postgres::PgPool] (PostgreSQL)
 /// * [SqlitePool][crate::sqlite::SqlitePool] (SQLite)
@@ -154,7 +146,7 @@ pub use self::options::PoolOptions;
 /// option in [PoolOptions], the pool will create that many connections up-front so that they are
 /// ready to go when a request comes in.
 ///
-/// ##### 2. Connection Limits (MySQL, MSSQL, Postgres)
+/// ##### 2. Connection Limits (MySQL, Postgres)
 /// Database servers usually place hard limits on the number of connections that it allows open at
 /// any given time, to maintain performance targets and prevent excessive allocation of resources,
 /// namely RAM.
@@ -167,9 +159,6 @@ pub use self::options::PoolOptions;
 /// In MySQL, the default limit is typically 150, plus 1 which is reserved for a user with the
 /// `CONNECTION_ADMIN` privilege so you can still access the server to diagnose problems even
 /// with all connections being used.
-///
-/// In MSSQL the only documentation for the default maximum limit is that it depends on the version
-/// and server configuration.
 ///
 /// In Postgres, the default limit is typically 100, minus 3 which are reserved for superusers
 /// (putting the default limit for unprivileged users at 97 connections).

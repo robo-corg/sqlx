@@ -73,17 +73,6 @@ pub mod value;
 #[cfg(feature = "migrate")]
 pub mod migrate;
 
-#[cfg(all(
-    any(
-        feature = "postgres",
-        feature = "mysql",
-        feature = "mssql",
-        feature = "sqlite"
-    ),
-    feature = "any"
-))]
-pub mod any;
-
 #[cfg(feature = "postgres")]
 #[cfg_attr(docsrs, doc(cfg(feature = "postgres")))]
 pub mod postgres;
@@ -95,10 +84,6 @@ pub mod sqlite;
 #[cfg(feature = "mysql")]
 #[cfg_attr(docsrs, doc(cfg(feature = "mysql")))]
 pub mod mysql;
-
-#[cfg(feature = "mssql")]
-#[cfg_attr(docsrs, doc(cfg(feature = "mssql")))]
-pub mod mssql;
 
 /// sqlx uses ahash for increased performance, at the cost of reduced DoS resistance.
 use ahash::AHashMap as HashMap;

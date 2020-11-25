@@ -62,7 +62,7 @@ SQLx is an async, pure Rust<sub>†</sub> SQL crate featuring compile-time check
 -   **Type-safe SQL** (if you want it) without DSLs. Use the `query!()` macro to check your SQL and bind parameters at
     compile time. (You can still use dynamic SQL queries if you like.)
 
--   **Database Agnostic**. Support for [PostgreSQL], [MySQL], [SQLite], and [MSSQL].
+-   **Database Agnostic**. Support for [PostgreSQL], [MySQL], and [SQLite].
 
 -   **Pure Rust**. The Postgres and MySQL/MariaDB drivers are written in pure Rust using **zero** unsafe<sub>††</sub> code.
 
@@ -77,7 +77,6 @@ with C, those interactions are `unsafe`.</sup></sub>
 [postgresql]: http://postgresql.org/
 [sqlite]: https://sqlite.org/
 [mysql]: https://www.mysql.com/
-[mssql]: https://www.microsoft.com/en-us/sql-server
 
 ---
 
@@ -135,8 +134,6 @@ sqlx = { version = "0.4.0", features = [ "runtime-async-std-native-tls" ] }
 -   `runtime-actix-rustls`: Use the `actix` runtime and `rustls` TLS backend.
 
 -   `postgres`: Add support for the Postgres database server.
-
--   `mssql`: Add support for the MSSQL database server.
 
 -   `sqlite`: Add support for the self-contained [SQLite](https://sqlite.org/) database engine.
 

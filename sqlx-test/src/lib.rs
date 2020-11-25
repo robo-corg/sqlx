@@ -202,13 +202,6 @@ macro_rules! MySql_query_for_test_prepared_type {
 }
 
 #[macro_export]
-macro_rules! Mssql_query_for_test_prepared_type {
-    () => {
-        "SELECT CASE WHEN {0} IS NULL AND @p1 IS NULL THEN 1 WHEN {0} = @p1 THEN 1 ELSE 0 END, {0}, @p2"
-    };
-}
-
-#[macro_export]
 macro_rules! Sqlite_query_for_test_prepared_type {
     () => {
         "SELECT {0} is ?, {0}, ?"

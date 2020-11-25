@@ -6,7 +6,6 @@
 //!  * [PostgreSQL](../postgres/types/index.html)
 //!  * [MySQL](../mysql/types/index.html)
 //!  * [SQLite](../sqlite/types/index.html)
-//!  * [MSSQL](../mssql/types/index.html)
 //!
 //! Any external types that have had [`Type`] implemented for, are re-exported in this module
 //! for convenience as downstream users need to use a compatible version of the external crate
