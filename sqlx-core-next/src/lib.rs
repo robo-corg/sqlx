@@ -10,14 +10,24 @@
 
 mod arguments;
 mod connection;
+mod database;
 mod error;
 mod execute;
 mod executor;
+// mod from_value;
 mod options;
+mod to_value;
+mod r#type;
+mod type_info;
 
 pub use arguments::{Argument, Arguments};
 pub use connection::Connection;
+pub use database::{Database, HasOutput, HasTypeId};
 pub use error::{Error, Result};
 pub use execute::Execute;
 pub use executor::Executor;
+pub use type_info::TypeInfo;
+// pub use from_value::FromValue;
 pub use options::{ConnectOptions, ConnectOptionsBuilder, SslMode};
+pub use r#type::Type;
+pub use to_value::ToValue;

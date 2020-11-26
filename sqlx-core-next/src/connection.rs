@@ -1,4 +1,4 @@
-use crate::ConnectOptions;
+use crate::{ConnectOptions, Database};
 
 #[cfg(feature = "async")]
 use futures_core::future::BoxFuture;
@@ -12,6 +12,8 @@ use futures_core::future::BoxFuture;
 /// of this single SQL connection.
 ///
 pub trait Connection<R>: 'static + Send {
+    type Database: Database<R>;
+
     type Options: ConnectOptions<R, Connection = Self>;
 
     /// Establish a new database connection.

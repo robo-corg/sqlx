@@ -1,3 +1,4 @@
+use crate::Database;
 #[cfg(feature = "async")]
 use futures_core::future::BoxFuture;
 
@@ -40,7 +41,9 @@ use futures_core::future::BoxFuture;
 // 'a: argument values
 // 'c: connection
 // 'x: single execution
-pub trait Executor {
+pub trait Executor<R> {
+    type Database: Database<R>;
+
     #[cfg(feature = "async")]
     fn execute<'x, 'q: 'x, 'a: 'x, 'c: 'x, E>(self, command: E)
         -> BoxFuture<'x, crate::Result<()>>;
