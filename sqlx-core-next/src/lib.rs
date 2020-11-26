@@ -20,4 +20,4 @@ pub use connection::Connection;
 pub use error::{Error, Result};
 pub use execute::Execute;
 pub use executor::Executor;
-pub use options::{ConnectOptions, ConnectOptionsBuilder};
+pub use options::{ConnectOptions, ConnectOptionsBuilder, SslMode};

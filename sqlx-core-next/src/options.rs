@@ -6,6 +6,10 @@ use crate::Connection;
 #[cfg(feature = "async")]
 use futures_core::future::BoxFuture;
 
+mod ssl_mode;
+
+pub use ssl_mode::SslMode;
+
 /// Options which can be used to configure how a SQL connection is opened.
 pub trait ConnectOptions<R>:
     'static + Clone + Default + Debug + FromStr<Err = crate::Error> + Send + Sync
