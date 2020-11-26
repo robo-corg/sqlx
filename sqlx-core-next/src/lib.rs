@@ -6,7 +6,7 @@
 //! and then the core types and the drivers are re-exported together in the main `sqlx` crate.
 //!
 #![warn(future_incompatible, rust_2018_idioms)]
-#![cfg_attr(feature = "sqlite", deny(unsafe_code))]
+#![deny(unsafe_code)]
 
 mod arguments;
 mod connection;
