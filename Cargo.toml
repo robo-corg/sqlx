@@ -1,8 +1,10 @@
 [workspace]
 members = [
+    "sqlx-core-next",
+
     # ".",
-    "sqlx-core",
-    "sqlx-rt",
+    # "sqlx-rt",
+    # "sqlx-core",
     # "sqlx-macros",
     # "sqlx-test",
     # "sqlx-cli",
