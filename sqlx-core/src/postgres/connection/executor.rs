@@ -19,6 +19,8 @@ use futures_core::Stream;
 use futures_util::{pin_mut, TryStreamExt};
 use std::{borrow::Cow, sync::Arc};
 
+const USING_CDB: bool = false;
+
 async fn prepare(
     conn: &mut PgConnection,
     sql: &str,
@@ -66,6 +68,8 @@ async fn prepare(
         .stream
         .recv_expect(MessageFormat::ParseComplete)
         .await?;
+
+    println!("Parse complete!");
 
     let metadata = if let Some(metadata) = metadata {
         // each SYNC produces one READY FOR QUERY
@@ -129,11 +133,20 @@ impl PgConnection {
     pub(super) async fn wait_for_close_complete(&mut self, mut count: usize) -> Result<(), Error> {
         // we need to wait for the [CloseComplete] to be returned from the server
         while count > 0 {
-            match self.stream.recv().await? {
+            let msg = self.stream.recv().await?;
+
+            println!("Got (wait_for_close_complete): {:?}", msg.format);
+
+            match msg {
                 message if message.format == MessageFormat::PortalSuspended => {
                     // there was an open portal
                     // this can happen if the last time a statement was used it was not fully executed
                     // such as in [fetch_one]
+
+                    self.stream.write(message::Execute {
+                        portal: None,
+                        limit: 0
+                    });
                 }
 
                 message if message.format == MessageFormat::CloseComplete => {
@@ -204,19 +217,34 @@ impl PgConnection {
         // before we continue, wait until we are "ready" to accept more queries
         self.wait_until_ready().await?;
 
+        println!("Starting execution of query: `{}` limit={}", query, limit);
+
         let mut metadata: Arc<PgStatementMetadata>;
 
         let format = if let Some(mut arguments) = arguments {
+
+            println!("{}: run:start pending_ready_for_query_count={}", query, self.pending_ready_for_query_count);
+
+
             // prepare the statement if this our first time executing it
             // always return the statement ID here
             let (statement, metadata_) = self
                 .get_or_prepare(query, &arguments.types, persistent, metadata_opt)
                 .await?;
 
+            println!("{}: run:post-prepare pending_ready_for_query_count={}", query, self.pending_ready_for_query_count);
+
             metadata = metadata_;
 
             // patch holes created during encoding
             arguments.apply_patches(self, &metadata.parameters).await?;
+
+            // self.stream.write(Close::Portal(0));
+            // self.write_sync();
+            // self.stream.flush().await?;
+
+            // self.wait_for_close_complete(1).await;
+            // self.wait_until_ready().await;
 
             // bind to attach the arguments to the statement and create a portal
             self.stream.write(Bind {
@@ -242,6 +270,8 @@ impl PgConnection {
             // termed batching might suit this.
             self.write_sync();
 
+            println!("{}: run:post-write-sync pending_ready_for_query_count={}", query, self.pending_ready_for_query_count);
+
             // prepared statements are binary
             PgValueFormat::Binary
         } else {
@@ -259,8 +289,13 @@ impl PgConnection {
         self.stream.flush().await?;
 
         Ok(try_stream! {
+            let mut command_complete = false;
+            let mut ready_for_query = false;
+
             loop {
                 let message = self.stream.recv().await?;
+
+                println!("{}: Got {:?} command_complete={:?} ready_for_query={:?} pending_ready_for_query_count={}", query, message.format, command_complete, ready_for_query, self.pending_ready_for_query_count);
 
                 match message.format {
                     MessageFormat::BindComplete
@@ -274,13 +309,38 @@ impl PgConnection {
                         // a SQL command completed normally
                         let cc: CommandComplete = message.decode()?;
 
+                        command_complete = true;
+
                         r#yield!(Either::Left(PgDone {
                             rows_affected: cc.rows_affected(),
                         }));
+
+                        if ready_for_query && command_complete {
+                            break;
+                        }
+                    }
+
+                    MessageFormat::PortalSuspended => {
+                        // TODO: This breaks postgres but fixes CDB
+                        if USING_CDB {
+                            println!("{}: start PortalSuspended", query);
+                            self.stream.write(message::Execute {
+                                portal: None,
+                                limit: 0
+                            });
+                            self.write_sync();
+                            self.stream.flush().await?;
+
+                            println!("{}: post portalsuspend handled", query);
+                        }
+                        else {
+                            command_complete = true;
+                        }
                     }
 
                     MessageFormat::EmptyQueryResponse => {
                         // empty query string passed to an unprepared execute
+                        command_complete = true;
                     }
 
                     MessageFormat::RowDescription => {
@@ -313,7 +373,14 @@ impl PgConnection {
                     MessageFormat::ReadyForQuery => {
                         // processing of the query string is complete
                         self.handle_ready_for_query(message)?;
-                        break;
+
+                        if self.pending_ready_for_query_count == 0 {
+                            ready_for_query = true;
+                        }
+
+                        if ready_for_query && command_complete {
+                            break;
+                        }
                     }
 
                     _ => {
@@ -324,6 +391,8 @@ impl PgConnection {
                     }
                 }
             }
+
+            println!("{}: Complete", query);
 
             Ok(())
         })
@@ -375,13 +444,16 @@ impl<'c> Executor<'c> for &'c mut PgConnection {
             let s = self.run(sql, arguments, 1, persistent, metadata).await?;
             pin_mut!(s);
 
+            let mut ret = None;
+
             while let Some(s) = s.try_next().await? {
                 if let Either::Right(r) = s {
-                    return Ok(Some(r));
+                    ret = Some(r);
+                    //return Ok();
                 }
             }
 
-            Ok(None)
+            Ok(ret)
         })
     }
 
